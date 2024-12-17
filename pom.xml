@@ -11,12 +11,15 @@
     <modules>
         <module>dispatcher</module>
         <module>common-rabbitmq</module>
+        <module>node</module>
+        <module>common-jpa</module>
     </modules>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <telegrambot.starter.version>6.1.0</telegrambot.starter.version>
     </properties>
 
     <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-parent -->
