@@ -1,7 +1,7 @@
 package ru.bolnik.dima.dao;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import ru.bolnik.dima.entity.AppDocument;
 
-public interface AppDocumentDAO extends CrudRepository<AppDocument, Long> {
+public interface AppDocumentDAO extends JpaRepository<AppDocument, Long> {
 }
