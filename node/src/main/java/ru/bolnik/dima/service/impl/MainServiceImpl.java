@@ -13,11 +13,14 @@ import ru.bolnik.dima.entity.AppUser;
 import ru.bolnik.dima.entity.RawData;
 import ru.bolnik.dima.entity.enums.UserState;
 import ru.bolnik.dima.exceptions.UploadFileException;
+import ru.bolnik.dima.service.AppUserService;
 import ru.bolnik.dima.service.FileService;
 import ru.bolnik.dima.service.MainService;
 import ru.bolnik.dima.service.ProducerService;
 import ru.bolnik.dima.service.enums.LinkType;
 import ru.bolnik.dima.service.enums.ServiceCommands;
+
+import java.util.Optional;
 
 import static ru.bolnik.dima.entity.enums.UserState.BASIC_STATE;
 import static ru.bolnik.dima.entity.enums.UserState.WAIT_FOR_EMAIL_STATE;
@@ -30,12 +33,15 @@ public class MainServiceImpl implements MainService {
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
     private final FileService fileService;
+    private final AppUserService appUserService;
 
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService) {
+
+    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService) {
         this.rawDataDAO = rawDataDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
         this.fileService = fileService;
+        this.appUserService = appUserService;
     }
 
     @Override
@@ -53,10 +59,10 @@ public class MainServiceImpl implements MainService {
         } else if (BASIC_STATE.equals(userState)) {
             output = processServiceCommand(appUser, text);
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
-            //TODO добавить обработку емайла
+            output = appUserService.setEmail(appUser, text);
         } else {
             log.debug("Unknown user state: " + userState);
-            output = "Неизвестная ощибка! Введите /cancel и попробуйте снова!";
+            output = "Неизвестная ошибка! Введите /cancel и попробуйте снова!";
         }
 
         Long chatId = update.getMessage().getChatId();
@@ -135,8 +141,7 @@ public class MainServiceImpl implements MainService {
     private String processServiceCommand(AppUser appUser, String cmd) {
         ServiceCommands serviceCommands = ServiceCommands.fromValue(cmd);
         if (REGISTRATION.equals(serviceCommands)) {
-            //todo добавить регистрацию
-            return "Временно недоступно!";
+          return appUserService.registerUser(appUser);
         } else if (HELP.equals(serviceCommands)) {
             return help();
         } else if (START.equals(serviceCommands)) {
@@ -160,21 +165,20 @@ public class MainServiceImpl implements MainService {
 
     private AppUser findOrSaveAppUser(Update update) {
         User telegramUser = update.getMessage().getFrom();
-        AppUser persistentUser = appUserDAO.findAppUserByTelegramUserId(telegramUser.getId());
-        if (persistentUser == null) {
+        Optional<AppUser> optional = appUserDAO.findByTelegramUserId(telegramUser.getId());
+        if (optional.isEmpty()) {
             AppUser transientUser = AppUser.builder()
                     .telegramUserId(telegramUser.getId())
                     .userName(telegramUser.getUserName())
                     .firstName(telegramUser.getFirstName())
                     .lastName(telegramUser.getLastName())
-                    //TODO изменить значение по умолчанию после добавления регистрации
-                    .isActive(true)
+                    .isActive(false)
                     .state(BASIC_STATE)
                     .build();
 
             return appUserDAO.save(transientUser);
         }
-        return persistentUser;
+        return optional.get();
     }
 
     private void saveRawDate(Update update) {
