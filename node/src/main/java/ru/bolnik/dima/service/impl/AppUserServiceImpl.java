@@ -1,13 +1,9 @@
 package ru.bolnik.dima.service.impl;
 
 import lombok.extern.log4j.Log4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 import ru.bolnik.dima.dao.AppUserDAO;
 import ru.bolnik.dima.dto.MailParams;
 import ru.bolnik.dima.entity.AppUser;
@@ -16,6 +12,8 @@ import ru.bolnik.dima.utils.CryptoTool;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+
+import java.util.Optional;
 
 import static ru.bolnik.dima.entity.enums.UserState.BASIC_STATE;
 import static ru.bolnik.dima.entity.enums.UserState.WAIT_FOR_EMAIL_STATE;
@@ -26,13 +24,15 @@ public class AppUserServiceImpl implements AppUserService {
 
     private final AppUserDAO appUserDAO;
     private final CryptoTool cryptoTool;
+    private final RabbitTemplate rabbitTemplate;
 
-    @Value("${service.mail.uri}")
-    private String mailServiceUri;
+    @Value("${spring.rabbitmq.queues.registration-mail}")
+    private String registrationMailQueue;
 
-    public AppUserServiceImpl(AppUserDAO appUserDAO, CryptoTool cryptoTool) {
+    public AppUserServiceImpl(AppUserDAO appUserDAO, CryptoTool cryptoTool, RabbitTemplate rabbitTemplate) {
         this.appUserDAO = appUserDAO;
         this.cryptoTool = cryptoTool;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
 
@@ -57,22 +57,17 @@ public class AppUserServiceImpl implements AppUserService {
         } catch (AddressException e) {
             return "Введите, пожалуйста, корректный email. Для отмены команды введите /cancel";
         }
-        var appUserOpt = appUserDAO.findByEmail(email);
+
+        Optional<AppUser> appUserOpt = appUserDAO.findByEmail(email);
+
         if (appUserOpt.isEmpty()) {
             appUser.setEmail(email);
             appUser.setState(BASIC_STATE);
             appUser = appUserDAO.save(appUser);
 
-            var cryptoUserId = cryptoTool.hashOf(appUser.getId());
-            ResponseEntity<String> response = sendRegistrationMail(cryptoUserId, email);
-            if (response.getStatusCode() != HttpStatus.OK) {
-                String msg = String.format("Отправка эл. письма на почту %s не удалась.", email);
-                log.error(msg);
-                appUser.setEmail(null);
-                appUserDAO.save(appUser);
-                return msg;
-            }
-            return "Вам на почту было отправлено письмо. "
+            String cryptoUserId = cryptoTool.hashOf(appUser.getId());
+            sendRegistrationMail(cryptoUserId, email);
+            return "Вам на почту было отправлено письмо."
                    + "Перейдите по ссылке в письме для подтверждения регистрации.";
         } else {
             return "Этот email уже используется. Введите корректный email."
@@ -80,33 +75,11 @@ public class AppUserServiceImpl implements AppUserService {
         }
     }
 
-    private ResponseEntity<String> sendRegistrationMail(String cryptoUserId, String email) {
-        var restTemplate = new RestTemplate();
-        var headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
+    private void sendRegistrationMail(String cryptoUserId, String email) {
         var mailParams = MailParams.builder()
                 .id(cryptoUserId)
                 .emailTo(email)
                 .build();
-        var request = new HttpEntity<>(mailParams, headers);
-
-        ResponseEntity<String> exchange = null;
-        try {
-            exchange = restTemplate.exchange(mailServiceUri, HttpMethod.POST,
-                    request, String.class);
-
-            if (!exchange.getStatusCode().is2xxSuccessful()) {
-                log.error("Сервер вернул ошибочный статус: {}");
-                // Здесь можно добавить дополнительную логику обработки ошибочных статусов
-            }
-        } catch (ResourceAccessException e) {
-            log.error("Проблема с сетевым подключением", e);
-        } catch (HttpStatusCodeException e) {
-            log.error("HTTP ошибка: {}");
-        } catch (RestClientException e) {
-            log.error("Общая ошибка REST-клиента", e);
-        }
-        return exchange;
+        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
     }
 }

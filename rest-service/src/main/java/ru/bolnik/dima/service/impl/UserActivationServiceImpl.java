@@ -1,6 +1,5 @@
 package ru.bolnik.dima.service.impl;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.bolnik.dima.dao.AppUserDAO;
 import ru.bolnik.dima.service.UserActivationService;
@@ -9,8 +8,8 @@ import ru.bolnik.dima.utils.CryptoTool;
 
 @Service
 public class UserActivationServiceImpl implements UserActivationService {
-    private final AppUserDAO appUserDAO;
 
+    private final AppUserDAO appUserDAO;
     private final CryptoTool cryptoTool;
 
     public UserActivationServiceImpl(AppUserDAO appUserDAO, CryptoTool cryptoTool) {

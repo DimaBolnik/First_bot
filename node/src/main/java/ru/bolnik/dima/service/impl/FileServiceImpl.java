@@ -42,16 +42,16 @@ public class FileServiceImpl implements FileService {
     @Value("${link.address}")
     private String linkAddress;
 
-    private final AppDocumentDAO appDocumentDAO;
-    private final AppPhotoDAO appPhotoDAO;
-    private final BinaryContentDAO binaryContentDAO;
     private final CryptoTool cryptoTool;
+    private final AppPhotoDAO appPhotoDAO;
+    private final AppDocumentDAO appDocumentDAO;
+    private final BinaryContentDAO binaryContentDAO;
 
-    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, BinaryContentDAO binaryContentDAO, CryptoTool cryptoTool) {
-        this.appDocumentDAO = appDocumentDAO;
-        this.appPhotoDAO = appPhotoDAO;
-        this.binaryContentDAO = binaryContentDAO;
+    public FileServiceImpl(CryptoTool cryptoTool, AppPhotoDAO appPhotoDAO, AppDocumentDAO appDocumentDAO, BinaryContentDAO binaryContentDAO) {
         this.cryptoTool = cryptoTool;
+        this.appPhotoDAO = appPhotoDAO;
+        this.appDocumentDAO = appDocumentDAO;
+        this.binaryContentDAO = binaryContentDAO;
     }
 
 
@@ -60,9 +60,9 @@ public class FileServiceImpl implements FileService {
         Document telegramDoc = telegramMessage.getDocument();
         String fileId = telegramDoc.getFileId();
         ResponseEntity<String> response = getFilePath(fileId);
-        if ( response.getStatusCode() == HttpStatus.OK) {
+        if (response.getStatusCode() == HttpStatus.OK) {
             BinaryContent persistentBinaryContent = getPersistentBinaryContent(response);
-            AppDocument transientAppDoc = buildTransientAppDoc(telegramDoc,persistentBinaryContent);
+            AppDocument transientAppDoc = buildTransientAppDoc(telegramDoc, persistentBinaryContent);
             return appDocumentDAO.save(transientAppDoc);
         } else {
             throw new UploadFileException("Bad response from telegram service: " + response);
@@ -72,13 +72,13 @@ public class FileServiceImpl implements FileService {
     @Override
     public AppPhoto processPhoto(Message telegramMessage) {
         int photoSizeCount = telegramMessage.getPhoto().size();
-        int photoIndex = photoSizeCount > 1 ? telegramMessage.getPhoto().size() -1 : 0;
+        int photoIndex = photoSizeCount > 1 ? telegramMessage.getPhoto().size() - 1 : 0;
         PhotoSize telegramPhoto = telegramMessage.getPhoto().get(photoIndex);
         String fileId = telegramPhoto.getFileId();
         ResponseEntity<String> response = getFilePath(fileId);
-        if ( response.getStatusCode() == HttpStatus.OK) {
+        if (response.getStatusCode() == HttpStatus.OK) {
             BinaryContent persistentBinaryContent = getPersistentBinaryContent(response);
-            AppPhoto transientAppDoc = buildTransientAppPhoto(telegramPhoto,persistentBinaryContent);
+            AppPhoto transientAppDoc = buildTransientAppPhoto(telegramPhoto, persistentBinaryContent);
             return appPhotoDAO.save(transientAppDoc);
         } else {
             throw new UploadFileException("Bad response from telegram service: " + response);

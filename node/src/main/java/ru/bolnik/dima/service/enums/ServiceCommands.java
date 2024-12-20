@@ -1,6 +1,7 @@
 package ru.bolnik.dima.service.enums;
 
 public enum ServiceCommands {
+
     HELP("/help"),
     REGISTRATION("/registration"),
     CANCEL("/cancel"),

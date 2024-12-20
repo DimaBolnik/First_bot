@@ -2,6 +2,7 @@ package ru.bolnik.dima.service.impl;
 
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -26,14 +27,15 @@ import static ru.bolnik.dima.entity.enums.UserState.BASIC_STATE;
 import static ru.bolnik.dima.entity.enums.UserState.WAIT_FOR_EMAIL_STATE;
 import static ru.bolnik.dima.service.enums.ServiceCommands.*;
 
-@Service
 @Log4j
+@Service
 public class MainServiceImpl implements MainService {
+
     private final RawDataDAO rawDataDAO;
-    private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
     private final FileService fileService;
     private final AppUserService appUserService;
+    private final ProducerService producerService;
 
 
     public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService) {
@@ -44,6 +46,7 @@ public class MainServiceImpl implements MainService {
         this.appUserService = appUserService;
     }
 
+    @Transactional
     @Override
     public void processTextMessage(Update update) {
         saveRawDate(update);
@@ -141,7 +144,7 @@ public class MainServiceImpl implements MainService {
     private String processServiceCommand(AppUser appUser, String cmd) {
         ServiceCommands serviceCommands = ServiceCommands.fromValue(cmd);
         if (REGISTRATION.equals(serviceCommands)) {
-          return appUserService.registerUser(appUser);
+            return appUserService.registerUser(appUser);
         } else if (HELP.equals(serviceCommands)) {
             return help();
         } else if (START.equals(serviceCommands)) {
@@ -165,8 +168,8 @@ public class MainServiceImpl implements MainService {
 
     private AppUser findOrSaveAppUser(Update update) {
         User telegramUser = update.getMessage().getFrom();
-        Optional<AppUser> optional = appUserDAO.findByTelegramUserId(telegramUser.getId());
-        if (optional.isEmpty()) {
+        Optional<AppUser> appUserOpt = appUserDAO.findByTelegramUserId(telegramUser.getId());
+        if (appUserOpt.isEmpty()) {
             AppUser transientUser = AppUser.builder()
                     .telegramUserId(telegramUser.getId())
                     .userName(telegramUser.getUserName())
@@ -175,10 +178,9 @@ public class MainServiceImpl implements MainService {
                     .isActive(false)
                     .state(BASIC_STATE)
                     .build();
-
             return appUserDAO.save(transientUser);
         }
-        return optional.get();
+        return appUserOpt.get();
     }
 
     private void saveRawDate(Update update) {
