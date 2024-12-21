@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 @RestController
 public class WebHookController {
+
     private final UpdateProcessor updateProcessor;
 
     public WebHookController(UpdateProcessor updateProcessor) {

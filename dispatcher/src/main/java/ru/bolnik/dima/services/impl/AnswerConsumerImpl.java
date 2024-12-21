@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.bolnik.dima.controller.UpdateProcessor;
 import ru.bolnik.dima.services.AnswerConsumer;
 
-import static ru.bolnik.dima.model.RabbitQueue.ANSWER_MESSAGE;
 
 @Service
 public class AnswerConsumerImpl implements AnswerConsumer {
@@ -18,7 +17,7 @@ public class AnswerConsumerImpl implements AnswerConsumer {
     }
 
     @Override
-    @RabbitListener(queues = ANSWER_MESSAGE)
+    @RabbitListener(queues = "${spring.rabbitmq.queues.answer-message}")
     public void consume(SendMessage sendMessage) {
         updateProcessor.setView(sendMessage);
     }
