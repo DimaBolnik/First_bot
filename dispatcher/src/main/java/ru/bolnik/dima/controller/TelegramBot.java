@@ -24,7 +24,7 @@ public class TelegramBot extends TelegramWebhookBot {
     @Value("${bot.uri}")
     private String botUri;
 
-    private UpdateProcessor updateProcessor;
+    private final UpdateProcessor updateProcessor;
 
     public TelegramBot(UpdateProcessor updateProcessor) {
         this.updateProcessor = updateProcessor;

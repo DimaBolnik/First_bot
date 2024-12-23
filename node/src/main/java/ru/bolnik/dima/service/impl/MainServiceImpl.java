@@ -46,7 +46,7 @@ public class MainServiceImpl implements MainService {
         this.appUserService = appUserService;
     }
 
-    @Transactional
+//    @Transactional
     @Override
     public void processTextMessage(Update update) {
         saveRawDate(update);
