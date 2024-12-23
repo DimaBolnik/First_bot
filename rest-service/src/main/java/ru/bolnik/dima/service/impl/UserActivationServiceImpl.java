@@ -2,6 +2,7 @@ package ru.bolnik.dima.service.impl;
 
 import org.springframework.stereotype.Service;
 import ru.bolnik.dima.dao.AppUserDAO;
+import ru.bolnik.dima.entity.AppUser;
 import ru.bolnik.dima.service.UserActivationService;
 import ru.bolnik.dima.utils.CryptoTool;
 
@@ -22,7 +23,7 @@ public class UserActivationServiceImpl implements UserActivationService {
         Long userId = cryptoTool.idOf(cryptoUserId);
         var optional = appUserDAO.findById(userId);
         if (optional.isPresent()) {
-            var user = optional.get();
+            AppUser user = optional.get();
             user.setIsActive(true);
             appUserDAO.save(user);
             return true;

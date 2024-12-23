@@ -72,6 +72,7 @@
             <artifactId>hibernate-types-52</artifactId>
             <version>${hibernate-types.version}</version>
         </dependency>
+
     </dependencies>
 
 </project>
