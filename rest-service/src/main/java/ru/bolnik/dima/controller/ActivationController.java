@@ -21,7 +21,7 @@ public class ActivationController {
     public ResponseEntity<?> activation(@RequestParam("id") String id) {
         boolean res = userActivationService.activation(id);
         if (res) {
-            return ResponseEntity.ok().body("Регистрация успешно завершена!");
+            return ResponseEntity.ok().body("Регистрация успешно завершена!!!");
         }
         return ResponseEntity.internalServerError().build();
     }
