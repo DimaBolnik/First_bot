@@ -1,0 +1,12 @@
+server:
+  port: 8086
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5400/First_bot_bd
+    username: Dima
+    password: Bolnik
+  jpa:
+    generate-ddl: true
+
+salt: fe7cc4155e15cc4237cd00aa5b0aa15e
