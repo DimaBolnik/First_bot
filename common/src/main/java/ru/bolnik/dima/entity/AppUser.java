@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
-import ru.relex.enums.UserState;
+import ru.bolnik.dima.enums.UserState;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -41,7 +41,7 @@ public class AppUser {
 
     private String lastName;
 
-    private String username;
+    private String userName;
 
     private String email;
 

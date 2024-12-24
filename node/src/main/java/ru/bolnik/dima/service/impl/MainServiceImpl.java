@@ -12,7 +12,7 @@ import ru.bolnik.dima.entity.AppDocument;
 import ru.bolnik.dima.entity.AppPhoto;
 import ru.bolnik.dima.entity.AppUser;
 import ru.bolnik.dima.entity.RawData;
-import ru.bolnik.dima.entity.enums.UserState;
+import ru.bolnik.dima.enums.UserState;
 import ru.bolnik.dima.exceptions.UploadFileException;
 import ru.bolnik.dima.service.AppUserService;
 import ru.bolnik.dima.service.FileService;
@@ -23,8 +23,8 @@ import ru.bolnik.dima.service.enums.ServiceCommands;
 
 import java.util.Optional;
 
-import static ru.bolnik.dima.entity.enums.UserState.BASIC_STATE;
-import static ru.bolnik.dima.entity.enums.UserState.WAIT_FOR_EMAIL_STATE;
+import static ru.bolnik.dima.enums.UserState.BASIC_STATE;
+import static ru.bolnik.dima.enums.UserState.WAIT_FOR_EMAIL_STATE;
 import static ru.bolnik.dima.service.enums.ServiceCommands.*;
 
 @Log4j

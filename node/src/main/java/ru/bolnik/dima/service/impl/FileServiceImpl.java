@@ -1,6 +1,7 @@
 package ru.bolnik.dima.service.impl;
 
 import lombok.extern.log4j.Log4j;
+import org.hashids.Hashids;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -18,7 +19,6 @@ import ru.bolnik.dima.entity.BinaryContent;
 import ru.bolnik.dima.exceptions.UploadFileException;
 import ru.bolnik.dima.service.FileService;
 import ru.bolnik.dima.service.enums.LinkType;
-import ru.bolnik.dima.utils.CryptoTool;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,13 +42,14 @@ public class FileServiceImpl implements FileService {
     @Value("${link.address}")
     private String linkAddress;
 
-    private final CryptoTool cryptoTool;
+
+    private final Hashids hashids;
     private final AppPhotoDAO appPhotoDAO;
     private final AppDocumentDAO appDocumentDAO;
     private final BinaryContentDAO binaryContentDAO;
 
-    public FileServiceImpl(CryptoTool cryptoTool, AppPhotoDAO appPhotoDAO, AppDocumentDAO appDocumentDAO, BinaryContentDAO binaryContentDAO) {
-        this.cryptoTool = cryptoTool;
+    public FileServiceImpl(Hashids hashids, AppPhotoDAO appPhotoDAO, AppDocumentDAO appDocumentDAO, BinaryContentDAO binaryContentDAO) {
+        this.hashids = hashids;
         this.appPhotoDAO = appPhotoDAO;
         this.appDocumentDAO = appDocumentDAO;
         this.binaryContentDAO = binaryContentDAO;
@@ -149,7 +150,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public String generateLink(Long docId, LinkType linkType) {
-        String hash = cryptoTool.hashOf(docId);
+        String hash = hashids.encode(docId);
         return "http://" + linkAddress + "/" + linkType + "?id=" + hash;
     }
 }
