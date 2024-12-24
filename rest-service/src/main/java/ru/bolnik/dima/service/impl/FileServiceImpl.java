@@ -7,7 +7,7 @@ import ru.bolnik.dima.dao.AppPhotoDAO;
 import ru.bolnik.dima.entity.AppDocument;
 import ru.bolnik.dima.entity.AppPhoto;
 import ru.bolnik.dima.service.FileService;
-import ru.bolnik.dima.utils.CryptoTool;
+import ru.bolnik.dima.utils.Decoder;
 
 @Log4j
 @Service
@@ -15,17 +15,17 @@ public class FileServiceImpl implements FileService {
 
     private final AppDocumentDAO appDocumentDAO;
     private final AppPhotoDAO appPhotoDAO;
-    private final CryptoTool cryptoTool;
+    private final Decoder decoder;
 
-    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, CryptoTool cryptoTool) {
+    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, CryptoTool cryptoTool, Decoder decoder) {
         this.appDocumentDAO = appDocumentDAO;
         this.appPhotoDAO = appPhotoDAO;
-        this.cryptoTool = cryptoTool;
+        this.decoder = decoder;
     }
 
     @Override
     public AppDocument getDocument(String hash) {
-        Long id = cryptoTool.idOf(hash);
+        Long id = decoder.idOf(hash);
         if (id == null) {
             return null;
         }
@@ -34,7 +34,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public AppPhoto getPhoto(String hash) {
-        Long id = cryptoTool.idOf(hash);
+        Long id = decoder.idOf(hash);
         if (id == null) {
             return null;
         }

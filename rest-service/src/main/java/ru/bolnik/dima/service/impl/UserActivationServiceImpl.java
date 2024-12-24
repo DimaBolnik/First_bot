@@ -4,23 +4,23 @@ import org.springframework.stereotype.Service;
 import ru.bolnik.dima.dao.AppUserDAO;
 import ru.bolnik.dima.entity.AppUser;
 import ru.bolnik.dima.service.UserActivationService;
-import ru.bolnik.dima.utils.CryptoTool;
+import ru.bolnik.dima.utils.Decoder;
 
 
 @Service
 public class UserActivationServiceImpl implements UserActivationService {
 
     private final AppUserDAO appUserDAO;
-    private final CryptoTool cryptoTool;
+    private final Decoder decoder;
 
-    public UserActivationServiceImpl(AppUserDAO appUserDAO, CryptoTool cryptoTool) {
+    public UserActivationServiceImpl(AppUserDAO appUserDAO, Decoder decoder) {
         this.appUserDAO = appUserDAO;
-        this.cryptoTool = cryptoTool;
+        this.decoder = decoder;
     }
 
     @Override
     public boolean activation(String cryptoUserId) {
-        Long userId = cryptoTool.idOf(cryptoUserId);
+        Long userId = decoder.idOf(cryptoUserId);
         var optional = appUserDAO.findById(userId);
         if (optional.isPresent()) {
             AppUser user = optional.get();

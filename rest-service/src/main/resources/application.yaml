@@ -1,12 +1,11 @@
 server:
-  port: 8086
-
+  port: ${REST_SERVICE_PORT:8086}
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5400/First_bot_bd
-    username: Dima
-    password: Bolnik
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
   jpa:
     generate-ddl: true
 
-salt: 
+salt: ${SALT:test}
