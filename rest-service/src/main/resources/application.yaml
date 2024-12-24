@@ -9,4 +9,4 @@ spring:
   jpa:
     generate-ddl: true
 
-salt: fe7cc4155e15cc4237cd00aa5b0aa15e
+salt: 
