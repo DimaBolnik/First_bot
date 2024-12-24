@@ -11,8 +11,10 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Configuration
 public class RabbitConfiguration {
+
     @Value("${spring.rabbitmq.queues.registration-mail}")
     private String registrationMailQueue;
+
     @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
