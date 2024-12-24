@@ -18,7 +18,7 @@ spring:
     password: Bolnik
   jpa:
     generate-ddl: true
-token: 7214361801:AAHce3NcLUS6pNGU6djnAsaRcAa6t3CX21g
+token: 
 service:
   file_info:
     uri: https://api.telegram.org/bot{token}/getFile?file_id={fileId}
