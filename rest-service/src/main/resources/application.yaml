@@ -2,10 +2,10 @@ server:
   port: ${REST_SERVICE_PORT:8086}
 spring:
   datasource:
-    url: ${POSTGRES_URL}
-    username: ${POSTGRES_USERNAME}
-    password: ${POSTGRES_PASSWORD}
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5400/First_bot_bd}
+    username: ${POSTGRES_USERNAME:Dima}
+    password: ${POSTGRES_PASSWORD:Bolnik}
   jpa:
     generate-ddl: true
 
-salt: ${SALT:test}
+salt: ${SALT:Pq12GSnZ5CwkrmutojxQbMl3cRi8speFya760ONUYKgThHAWJIfLdD9V4XEvzB}

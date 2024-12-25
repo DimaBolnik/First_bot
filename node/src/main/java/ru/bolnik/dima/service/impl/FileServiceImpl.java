@@ -151,6 +151,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public String generateLink(Long docId, LinkType linkType) {
         String hash = hashids.encode(docId);
-        return "http://" + linkAddress + "/" + linkType + "?id=" + hash;
+        return  linkAddress + "/" + linkType + "?id=" + hash;
+//        return "http://" + "127.0.0.1:8086" + "/" + linkType + "?id=" + hash;
     }
 }

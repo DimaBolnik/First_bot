@@ -17,7 +17,7 @@ public class FileServiceImpl implements FileService {
     private final AppPhotoDAO appPhotoDAO;
     private final Decoder decoder;
 
-    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, CryptoTool cryptoTool, Decoder decoder) {
+    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, Decoder decoder) {
         this.appDocumentDAO = appDocumentDAO;
         this.appPhotoDAO = appPhotoDAO;
         this.decoder = decoder;
